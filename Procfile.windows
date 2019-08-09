@@ -1,2 +1,2 @@
 web: python app.py
-release: python -c "import models; models.migrate()"
+release: python migrate.py
