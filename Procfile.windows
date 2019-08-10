@@ -1,2 +1,2 @@
-web: python app.py
-release: python migrate.py
+web: venv\Scripts\python app.py
+release: venv\Scripts\python migrate.py
