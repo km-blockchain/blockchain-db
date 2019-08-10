@@ -17,5 +17,5 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     from_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    timestamp = db.Column(db.Datetime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     amount = db.Column(db.Integer, nullable=False)
