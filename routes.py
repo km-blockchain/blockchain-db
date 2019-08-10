@@ -9,6 +9,15 @@ def user():
     if not user:
         return abort(404)
     return jsonify(id=user.id, name=user.name)
+@app.route('/register')
+def register():
+    user = User(name=request.args['name'], password=request.args['password'])
+    db.session.add(user)
+    db.session.commit()
+    return redirect(url_for('user'))
+
+
+
 @app.route('/trans')
 def trans():
     trans = Transaction.querty.filter_by(id=request.args['trans_id']).first()
