@@ -36,7 +36,7 @@ def trans_from():
     user = User.query.filter_by(id=request.args.get('user_id', None)).first()
     if not user:
         return abort(404)
-    return jsonify(*[trans_object(i) for i in user.from_trans])
+    return jsonify([trans_object(i) for i in user.from_trans])
 
 
 @app.route('/trans_to')
@@ -44,7 +44,7 @@ def trans_to():
     user = User.query.filter_by(id=request.args.get('user_id', None)).first()
     if not user:
         return abort(404)
-    return jsonify(*[trans_object(i) for i in user.to_trans])
+    return jsonify([trans_object(i) for i in user.to_trans])
 
 
 @app.route('/trans_add')
