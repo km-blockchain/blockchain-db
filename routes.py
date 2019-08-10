@@ -4,7 +4,7 @@ from flask import jsonify, request, abort, redirect, url_for
 
 
 def trans_object(trans):
-    return {'id': trans.id, 'from_id': trans.from_id, 'to_id':trans.to_id, 'amount':trans.amount, 'timestamp':trans.timetamp}
+    return {'id': trans.id, 'from_id': trans.from_id, 'to_id':trans.to_id, 'amount':trans.amount, 'timestamp':trans.timestamp}
 
 
 @app.route('/user')
