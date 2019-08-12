@@ -56,4 +56,14 @@ def trans_add():
     trans = Transaction(from_id=request.args['from_id'], to_id=request.args['to_id'], amount=request.args['amount'])
     db.session.add(trans)
     db.session.commit()
+    query = Transaction.query.filter_by(block_id=None).all
+    count = len(query)
+    if count == 4:
+        block = Block()
+        db.session.add(block)
+        for trans in query:
+            trans.block_id = block.id
+            trans.hash = trans_to_hash(trans)
+            block.hash = block_to_hash(block)
     return redirect(url_for('trans', trans_id=trans.id))
+
