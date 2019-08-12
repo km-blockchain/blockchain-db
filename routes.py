@@ -7,6 +7,24 @@ from flask import jsonify, request, abort, redirect, url_for
 def trans_object(trans):
     return {'id': trans.id, 'from_id': trans.from_id, 'to_id':trans.to_id, 'amount':trans.amount, 'timestamp':trans.timestamp}
 
+def block_to_hash(block):
+    a = sha3_256()
+    a.update(block.id.to_bytes(4, 'big'))
+    a.update(ts(block.timestamp).to_bytes(8, 'big'))
+    query = Transaction.query.filter_by(block_id=block.id).order_by(Transaction.id).all()
+    for trans in query:
+        a.update(trans.hash)
+    return a.digest()
+
+
+def trans_to_hash(trans):
+    trans = sha3_256
+    trans.update(trans.id.to.bytes(4, 'big'))
+    trans.update(trans.from_id.to.bytes(4, 'big'))
+    trans.update(trans.to_id.to.bytes(4, 'big'))
+    trans.update(ts(trans.timestamp).to_bytes(8, 'big'))
+    trans.update(fl(trans.amount).to_bytes(8, 'big'))
+    return trans.digest()
 
 def ts(timestamp):
     return int(timestamp.timestamp())
@@ -86,4 +104,27 @@ def trans_add():
     trans = Transaction(from_id=request.args['from_id'], to_id=request.args['to_id'], amount=request.args['amount'])
     db.session.add(trans)
     db.session.commit()
+    query = Transaction.query.filter_by(block_id=None).all()
+    count = len(query)
+    if count == 4:
+        block = Block()
+        db.session.add(block)
+        for trans in query:
+            trans.block_id = block.id
+            trans.hash = trans_to_hash(trans)
+            block.hash = block_to_hash(block)
     return redirect(url_for('trans', trans_id=trans.id))
+
+
+@app.route('/verify_block')
+def verify_block():
+    user = User.query.filter_by(id=request.args.get('from_id', None)).first()
+    if user.password != request.args['password']:
+        return abort(401)
+    verify = Verifycation(user_id = user.id, block_id = request.args['block_id'])
+    db.session.add(verify)
+    db.session.commit()
+    return jsonify(success=True)
+
+
+
