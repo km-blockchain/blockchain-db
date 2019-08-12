@@ -90,10 +90,12 @@ def trans_add():
     if count == 4:
         block = Block()
         db.session.add(block)
+        db.session.commit()
         for trans in query:
             trans.block_id = block.id
             trans.hash = trans_to_hash(trans)
             block.hash = block_to_hash(block)
+        db.session.commit()
     return redirect(url_for('trans', trans_id=trans.id))
 
 
