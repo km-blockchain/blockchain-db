@@ -5,7 +5,7 @@ from flask import jsonify, request, abort, redirect, url_for
 
 
 def trans_object(trans):
-    return {'id': trans.id, 'from_id': trans.from_id, 'to_id':trans.to_id, 'amount':trans.amount, 'timestamp':trans.timetamp}
+    return {'id': trans.id, 'from_id': trans.from_id, 'to_id':trans.to_id, 'amount':trans.amount, 'timestamp':trans.timestamp}
 
 
 def trans_to_hash(trans):
@@ -46,7 +46,7 @@ def trans_from():
     user = User.query.filter_by(id=request.args.get('user_id', None)).first()
     if not user:
         return abort(404)
-    return jsonify(*[trans_object(i) for i in user.from_trans])
+    return jsonify([trans_object(i) for i in user.from_trans])
 
 
 @app.route('/trans_to')
@@ -54,7 +54,7 @@ def trans_to():
     user = User.query.filter_by(id=request.args.get('user_id', None)).first()
     if not user:
         return abort(404)
-    return jsonify(*[trans_object(i) for i in user.to_trans])
+    return jsonify([trans_object(i) for i in user.to_trans])
 
 
 @app.route('/trans_add')
@@ -66,4 +66,27 @@ def trans_add():
     trans = Transaction(from_id=request.args['from_id'], to_id=request.args['to_id'], amount=request.args['amount'])
     db.session.add(trans)
     db.session.commit()
+    query = Transaction.query.filter_by(block_id=None).all()
+    count = len(query)
+    if count == 4:
+        block = Block()
+        db.session.add(block)
+        for trans in query:
+            trans.block_id = block.id
+            trans.hash = trans_to_hash(trans)
+            block.hash = block_to_hash(block)
     return redirect(url_for('trans', trans_id=trans.id))
+
+
+@app.route('/verify_block')
+def verify_block():
+    user = User.query.filter_by(id=request.args.get('from_id', None)).first()
+    if user.password != request.args['password']:
+        return abort(401)
+    verify = Verifycation(user_id = user.id, block_id = request.args['block_id'])
+    db.session.add(verify)
+    db.session.commit()
+    return jsonify(success=True)
+
+
+
