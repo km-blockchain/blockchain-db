@@ -20,3 +20,13 @@ class Transaction(db.Model):
     to_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     amount = db.Column(db.Float, nullable=False)
+    hash = db.Column(db.LargeBinary(32))
+    block_id = db.Column(db.Integer, db.ForeignKey('blocks.id'))
+
+
+class Block(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    hash = db.Column(db.LargeBinary(32))
+    is_verified = db.Column(db.Boolean, default=False)
+    trans = db.relationship(Transaction, backref='block')
