@@ -13,6 +13,7 @@ class User(db.Model):
     from_trans = db.relationship('Transaction', foreign_keys='Transaction.from_id', backref='from_user')
     to_trans = db.relationship('Transaction', foreign_keys='Transaction.to_id', backref='to_user')
 
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     from_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
