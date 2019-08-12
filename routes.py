@@ -1,3 +1,4 @@
+from hashlib import sha3_256
 from app import app
 from models import *
 from flask import jsonify, request, abort, redirect, url_for
@@ -6,6 +7,15 @@ from flask import jsonify, request, abort, redirect, url_for
 def trans_object(trans):
     return {'id': trans.id, 'from_id': trans.from_id, 'to_id':trans.to_id, 'amount':trans.amount, 'timestamp':trans.timetamp}
 
+
+def trans_to_hash(trans):
+    trans = sha3_256
+    trans.update(trans.id.to.bytes(4, 'big'))
+    trans.update(trans.from_id.to.bytes(4, 'big'))
+    trans.update(trans.to_id.to.bytes(4, 'big'))
+    trans.update(ts(trans.timestamp).to_bytes(8, 'big'))
+    trans.update(fl(trans.amount).to_bytes(8, 'big'))
+    return trans.digest()
 
 @app.route('/user')
 def user():
