@@ -57,3 +57,15 @@ def trans_add():
     db.session.add(trans)
     db.session.commit()
     return redirect(url_for('trans', trans_id=trans.id))
+
+
+@app.route('/verify_block')
+def verify_block():
+    user = User.query.filter_by(id=request.args.get('from_id', None)).first()
+    if user.password != request.args['password']:
+        return abort(401)
+    verify = Verifycation(user_id = user.id, block_id = request.args['block_id'])
+    db.session.add(verify)
+    db.session.commit()
+    return jsonify(success=True)
+
