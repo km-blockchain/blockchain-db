@@ -15,7 +15,7 @@ def block_to_hash(block):
     query = Transaction.query.filter_by(block_id=block.id).order_by(Transaction.id).all()
     for trans in query:
         a.update(trans.hash)
-return a.digest()
+    return a.digest()
 
 
 @app.route('/user')
