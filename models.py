@@ -25,8 +25,19 @@ class Transaction(db.Model):
 
 
 class Block(db.Model):
+    __tablename__ = 'blocks'
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     hash = db.Column(db.LargeBinary(32))
     is_verified = db.Column(db.Boolean, default=False)
+    previous_hash = db.Column(db.LargeBinary(32), default=b'\x00' * 32)
     trans = db.relationship(Transaction, backref='block')
+    users = db.relationship(User, secondary='verifications', backref='blocks')
+
+
+class Verification(db.Model):
+    __tablename__ = 'verifications'
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), primary_key=True)
+    block_id = db.Column(db.Integer, db.ForeignKey('blocks.id'), primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
