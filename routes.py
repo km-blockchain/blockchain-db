@@ -11,7 +11,7 @@ def trans_object(trans):
 
 def block_object(block):
     return {'id': block.id, 'timestamp': block.timestamp, 'hash': block.hash.hex(),
-            'previous_hash': block.previous_hash.hex()}
+            'previous_hash': block.previous_hash.hex(), 'is_verified': block.is_verified}
 
 
 def block_to_hash(block):
@@ -149,3 +149,11 @@ def verify_get():
     if verify:
         return jsonify({})
     return redirect(url_for('block_get', block_id=block.id))
+
+
+@app.route('/login')
+def login():
+    user = User.query.filter_by(name=request.args['name']).first()
+    if user.password != request.args['password']:
+        return abort(401)
+    return redirect(url_for('user', user_id=user.id))
