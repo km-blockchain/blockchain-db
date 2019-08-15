@@ -3,7 +3,7 @@ from routes import ts, sha3_256
 db.drop_all()
 db.create_all()
 block = Block(is_verified=True)
-user = User(name='admin', password='admin', balance=10000)
+user = User(name='', password='*subcoinadmin*', balance=10000)
 db.session.add(block)
 db.session.add(user)
 db.session.commit()

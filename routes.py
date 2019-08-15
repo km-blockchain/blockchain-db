@@ -1,7 +1,10 @@
 from hashlib import sha3_256
+import re
 from app import app
 from models import *
 from flask import jsonify, request, abort, redirect, url_for
+login_checker = re.compile(r'[a-zA-Z0-9_\-]{6,}\Z')
+pass_checker = re.compile(r'[a-zA-Z0-9_\-*+@^$%#]{6,}\Z')
 
 
 def trans_object(trans):
@@ -53,6 +56,10 @@ def user():
 
 @app.route('/register')
 def register():
+    if not login_checker.match(request.args['name']):
+        return 500
+    if not pass_checker.match(request.args['password']):
+        return 500
     user = User(name=request.args['name'], password=request.args['password'])
     db.session.add(user)
     db.session.commit()
