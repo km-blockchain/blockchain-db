@@ -117,23 +117,31 @@ def trans_add():
 @app.route('/verify_block')
 def verify_block():
     user = User.query.filter_by(id=request.args['user_id']).first()
-    block = Block.query.filter_by(id=request.args['block_id']).first()
     verify = Verification.query.filter_by(user_id=request.args['user_id'],
                                           block_id=request.args['block_id']).first()
-    if block.is_verified or verify:
+    if verify:
         return jsonify(success=True)
     if user.password != request.args['password']:
         return abort(401)
+    block = Block.query.filter_by(id=request.args['block_id']).first()
+    if not block:
+        return abort(500)
     verify = Verification(user_id=user.id, block_id=request.args['block_id'])
     db.session.add(verify)
+    db.session.commit()
+    if block.is_verified:
+        return jsonify(success=True)
     if Verification.query.filter_by(block_id=request.args['block_id']).count() == 4:
         block.is_verified = True
+        db.session.commit()
         for trans in block.trans:
+            if trans.amount < 0:
+                continue
             if trans.amount > trans.from_user.balance:
                 continue
             trans.from_user.balance -= trans.amount
             trans.to_user.balance += trans.amount
-    db.session.commit()
+        db.session.commit()
     return jsonify(success=True)
 
 
